@@ -4,7 +4,7 @@ import serial
 import pygame
 
 
-def compute_value(line, minimum, maximum, inv):
+def compute_value(line, minimum, maximum):
     line = line.split(" ")
     if len(line) < 3:
         return False
@@ -16,19 +16,20 @@ def compute_value(line, minimum, maximum, inv):
         elif value[i] < 0:
             value[i] = 0
 
-    if inv is True:
-        return 255-value[0], 255-value[1], 255-value[2]
-    else:
-        return value[0], value[1], value[2]
+    return value[0]
 
 
 ser = serial.Serial("/dev/ttyACM0", 115200)
 pygame.init()
 
+# Keep old value to determine a mean value
+value = [[0, 0, 0], [0, 0, 0]]
+font = pygame.font.Font(None, 36)
+
 size = width, height = 640, 480
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Touchless 3D tracking")
-screen.fill((0, 0, 0))
+screen.fill((0, 0, 0))(value[0]+value[1])
 
 try:
     ser.open()
@@ -80,14 +81,18 @@ if ser.isOpen():
             # Read line from serial
             line = float(ser.readline())
             # Compute the value for red
-            value = compute_value(line, minimum, maximum, False)
-            value_text = compute_value(line, minimum, maximum, True)
+            value[1] = value[0]
+            value[0] = compute_value(line, minimum, maximum)
+            value_bg = [value[0][i] + value[1][i] for i in range(3)]
+            value_text = [255 - i for i in compute_value(line, minimum,
+                                                         maximum)]
 
             if value is not False:
-                screen.fill(value)
+                screen.fill((value_bg[0], value_bg[1], value_bg[2]))
 
                 # Display info in window
-                label = font.render("Running...", 1, value_text)
+                label = font.render("Running...", 1, (value_text[0],
+                                    value_text[1], value_text[2]))
                 label_pos = label.get_rect()
                 label_pos.centerx = screen.get_rect().centerx
                 label_pos.centery = 20
