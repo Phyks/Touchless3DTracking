@@ -4,7 +4,7 @@ import serial
 import pygame
 
 
-def compute_value(line, minimum, maximum):
+def compute_value(line, minimum, maximum, inv):
     line = line.split(" ")
     if len(line) < 3:
         return False
@@ -16,7 +16,10 @@ def compute_value(line, minimum, maximum):
         elif value[i] < 0:
             value[i] = 0
 
-    return value[0], value[1], value[2]
+    if inv is True:
+        return 255-value[0], 255-value[1], 255-value[2]
+    else:
+        return value[0], value[1], value[2]
 
 
 ser = serial.Serial("/dev/ttyACM0", 115200)
@@ -41,9 +44,23 @@ if ser.isOpen():
         minimum = [-1, -1, -1]
 
         print("Calibration :")
+        print("Press any key to launch the program when calibration is" +
+              "finished.")
+        # Display info in window
+        label = font.render("Calibration...", 1, (255, 255, 255))
+        label_pos = label.get_rect()
+        label_pos.centerx = screen.get_rect().centerx
+        label_pos.centery = 20
+        screen.blit(label, label_pos)
+
         pygame.display.flip()
 
-        for i in range(50):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.K_RETURN:
+                    running = False
+
             line = float(ser.readline())
 
             if line < minimum or minimum < 0:
@@ -51,21 +68,31 @@ if ser.isOpen():
             if line > maximum:
                 maximumR = line
 
-        print("Go :")
+        print("Running...")
         running = True
         while running:
             # Quit if window is closed
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT or event.type == pygame.KEYDOWN:
+                    pygame.quit()
                     running = False
 
             # Read line from serial
             line = float(ser.readline())
             # Compute the value for red
-            value = compute_value(line, minimum, maximum)
+            value = compute_value(line, minimum, maximum, False)
+            value_text = compute_value(line, minimum, maximum, True)
 
             if value is not False:
                 screen.fill(value)
+
+                # Display info in window
+                label = font.render("Running...", 1, value_text)
+                label_pos = label.get_rect()
+                label_pos.centerx = screen.get_rect().centerx
+                label_pos.centery = 20
+                screen.blit(label, label_pos)
+
                 pygame.display.flip()
 
         ser.close()
