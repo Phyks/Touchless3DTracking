@@ -89,12 +89,12 @@ void setup() {
 
 void loop() {
     // Print output to serial in decimal
-    Serial.print(time(PIN_R, MASK_R), DEC);
+    Serial.print(time(PIN_R, MASK_R));
     Serial.print(" ");
 
-    Serial.print(time(PIN_G, MASK_G), DEC);
+    //Serial.print(time(PIN_G, MASK_G));
     Serial.print(" ");
 
-    Serial.print(time(PIN_B, MASK_B), DEC);
-    Serial.print("\n");
+    //Serial.print(time(PIN_B, MASK_B));
+    Serial.println(" ");
 }

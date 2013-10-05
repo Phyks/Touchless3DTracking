@@ -5,18 +5,22 @@ import pygame
 
 
 def compute_value(line, minimum, maximum):
-    line = line.split(" ")
     if len(line) < 3:
         return False
 
+    value = [0, 0, 0]
     for i in range(3):
-        value[i] = int(255*(line[i]-minimum[i])/(maximum[i]-minimum[i]))
+        if maximum[i]-minimum[i] != 0:
+            value[i] = int(255*(line[i]-minimum[i])/(maximum[i]-minimum[i]))
+        else:
+            value[i] = 0
+
         if value[i] > 255:
             value[i] = 255
         elif value[i] < 0:
             value[i] = 0
 
-    return value[0]
+    return value
 
 
 ser = serial.Serial("/dev/ttyACM0", 115200)
@@ -29,7 +33,7 @@ font = pygame.font.Font(None, 36)
 size = width, height = 640, 480
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Touchless 3D tracking")
-screen.fill((0, 0, 0))(value[0]+value[1])
+screen.fill((0, 0, 0))
 
 try:
     ser.open()
@@ -45,7 +49,7 @@ if ser.isOpen():
         minimum = [-1, -1, -1]
 
         print("Calibration :")
-        print("Press any key to launch the program when calibration is" +
+        print("Press any key to launch the program when calibration is " +
               "finished.")
         # Display info in window
         label = font.render("Calibration...", 1, (255, 255, 255))
@@ -59,15 +63,22 @@ if ser.isOpen():
         running = True
         while running:
             for event in pygame.event.get():
-                if event.type == pygame.K_RETURN:
+                if event.type == pygame.KEYDOWN:
                     running = False
+                    continue
 
-            line = float(ser.readline())
+            line = ser.readline()
+            line = line.decode().strip("\r\n")
+            line = line.split(" ")
+            line = [int(j or 0) for j in line]
 
-            if line < minimum or minimum < 0:
-                minimumR = line
-            if line > maximum:
-                maximumR = line
+            for i in range(3):
+                if line[i] < minimum[i] or minimum[i] < 0:
+                    minimum[i] = line[i]
+                if line[i] > maximum[i]:
+                    maximum[i] = line[i]
+
+            print(line)
 
         print("Running...")
         running = True
@@ -77,13 +88,18 @@ if ser.isOpen():
                 if event.type == pygame.QUIT or event.type == pygame.KEYDOWN:
                     pygame.quit()
                     running = False
+                    continue
 
             # Read line from serial
-            line = float(ser.readline())
+            line = ser.readline()
+            line = line.decode().strip("\r\n")
+            line = line.split(" ")
+            line = [int(j or 0) for j in line]
+
             # Compute the value for red
             value[1] = value[0]
             value[0] = compute_value(line, minimum, maximum)
-            value_bg = [value[0][i] + value[1][i] for i in range(3)]
+            value_bg = [(value[0][i] + value[1][i])/2 for i in range(3)]
             value_text = [255 - i for i in compute_value(line, minimum,
                                                          maximum)]
 
