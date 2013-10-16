@@ -35,3 +35,16 @@ This script represents the position of your hand in the RGB space. You can then 
 * Same as colors.py but representing it with a 3D view.
 * Then, use the previous code as a control interface for your computer, just like Minority Report :)
 * Other ideas ? It's up to you :)
+
+## Note about the license
+# ============================================================================
+# All the scripts in this repository are released under a very permissive 
+# license. To make a long story short : do whatever you want with these 
+# scripts (but try to have fun :), I don't mind. It would be cool to quote
+# the origin of the script if you reuse it, but you don't have to. I'd like to
+# be noticed of what you did cool with it (if you think it's worth). :)
+# Ah, I almost forgot : If by chance we ever meet and you think this script is
+# worth, you can buy me a soda :)
+#
+#                                                                   Phyks
+# =============================================================================  
