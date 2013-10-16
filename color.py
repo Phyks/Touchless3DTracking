@@ -2,6 +2,8 @@
 
 import serial
 import pygame
+import sys
+import getopt
 
 
 def compute_value(line, minimum, maximum):
@@ -23,7 +25,27 @@ def compute_value(line, minimum, maximum):
     return value
 
 
-ser = serial.Serial("/dev/ttyACM0", 115200)
+serial_port = "/dev/ttyACM0"
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "hs:",["help", "serial="])
+
+    for opt, arg in opts:
+        if opt == "-h" or opt == "-help":
+            print("Touchless 3D tracking with color mapping")
+            print("\nUsage : "+sys.argv[0]+" [OPTIONS]")
+            print("\nTrack the position of your hand in 3D and map it in RGB space")
+            print("\nOptions :")
+            print("\t-h (--help) \t display this help message")
+            print("\t-s (--serial) \t change serial port (default is "+
+                  "/dev/tty/ACM0")
+            sys.exit(0)
+        elif opt in ("-s", "--serial"):
+            serial_port = arg
+except getopt.GetoptError:
+    pass
+
+ser = serial.Serial(serial_port, 115200)
 pygame.init()
 
 # Keep old value to determine a mean value
