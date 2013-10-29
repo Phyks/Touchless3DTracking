@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
+# TODO
 
 import pyglet
 import pyglet.gl as gl

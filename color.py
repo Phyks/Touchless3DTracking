@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/bin/env python3
 
 # ============================================================================
 # This script maps the 3D position of your hand, as detected by the electrodes
