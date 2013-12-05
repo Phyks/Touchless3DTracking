@@ -52,7 +52,12 @@ def sound(itr,samprate=16000,autoscale=True,output=False):
             wroteFrames=True
     if( not wroteFrames and not foundNumpy ):
         #python w/o np doesn't have "short"/"int16", "@h" is "native,aligned short"
-        waveWrite.writeframes( struct.pack(len(itr)*"@h",[int(mult*itm) for  itm in itr]) )
+        # BAD : waveWrite.writeframes( struct.pack(len(itr)*"@h",[int(mult*itm) for itm in itr]) )
+        writeValues = []
+        for itm in itr:
+            packed_value = struct.pack('h', int(mult*itm))
+            waveWrite.writeframes(packed_value)
+
         wroteFrames=True
         
     if( not wroteFrames ):
