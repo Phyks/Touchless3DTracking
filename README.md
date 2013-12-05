@@ -25,17 +25,17 @@ where `value1`, `value2`, `value3` are values directly proportional to the disch
 
 You'll also find some basic Python scripts as examples on possible use of the setup.
 
-### Colors.py
+### Colors
 
 This script represents the position of your hand in the RGB space. You can then pick a color by placing your hand at a specific point in the box of the electrodes.
 
-### Chorizo.py
+### Chorizo player
 
 __(working on)__
 
 A script to play music using chorizo pads as a musical keyboard. See [our website](http://hackens.org/Projets/TouchlessTracking) (french, but vids are available, more coming soon) for infos and demos.
 
-### 3d_view.py
+### 3d view
 
 __(working on)__
 

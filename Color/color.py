@@ -46,14 +46,14 @@ try:
     opts, args = getopt.getopt(sys.argv[1:], "hs:", ["help", "serial="])
 
     for opt, arg in opts:
-        if opt == "-h" or opt == "-help":
+        if opt in ("-h", "--help"):
             print("Touchless 3D tracking with color mapping")
             print("\nUsage : "+sys.argv[0]+" [OPTIONS]")
             print("\nTrack the position of your hand in 3D and map it " +
                   "in RGB space")
             print("\nOptions :")
             print("\t-h (--help) \t display this help message")
-            print("\t-s (--serial) \t change serial port (default is " +
+            print("\t-s (--serial=) \t change serial port (default is " +
                   "/dev/tty/ACM0")
             sys.exit(0)
         elif opt in ("-s", "--serial"):
