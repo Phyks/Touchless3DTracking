@@ -41,24 +41,25 @@ def sound(itr,samprate=16000,autoscale=True,output=False):
     waveWrite.setframerate(samprate) # 8kHz  default
     
     wroteFrames=False
+    # Not satisfied by the numpy implementation, buzzing and so...
     #Let's try to create sound from NumPy vector
-    if( foundNumpy ):
-        if( type(itr)==np.array ):
-            if( itr.ndim == 1 or itr.shape.count(1) == itr.ndim - 1 ):
-                waveWrite.writeframes( (mult*itr.flatten()).astype(np.int16).tostring() )
-                wroteFrames=True
-        else: #we have np, but the iterable isn't a vector
-            waveWrite.writeframes( (mult*np.array(itr)).astype(np.int16).tostring() )
-            wroteFrames=True
-    if( not wroteFrames and not foundNumpy ):
+    #if( foundNumpy ):
+    #    if( type(itr)==np.array ):
+    #        if( itr.ndim == 1 or itr.shape.count(1) == itr.ndim - 1 ):
+    #            waveWrite.writeframes( (mult*itr.flatten()).astype(np.int16).tostring() )
+    #            wroteFrames=True
+    #    else: #we have np, but the iterable isn't a vector
+    #        waveWrite.writeframes( (mult*np.array(itr)).astype(np.int16).tostring() )
+    #        wroteFrames=True
+    #if( not wroteFrames and not foundNumpy ):
         #python w/o np doesn't have "short"/"int16", "@h" is "native,aligned short"
         # BAD : waveWrite.writeframes( struct.pack(len(itr)*"@h",[int(mult*itm) for itm in itr]) )
-        writeValues = []
-        for itm in itr:
-            packed_value = struct.pack('h', int(mult*itm))
-            waveWrite.writeframes(packed_value)
-
-        wroteFrames=True
+    writeValues = []
+    for itm in itr:
+        packed_value = struct.pack('h', int(mult*itm))
+        waveWrite.writeframes(packed_value)
+    
+    wroteFrames=True
         
     if( not wroteFrames ):
         print("E: Unable to create sound.  Only 1D numpy arrays and numerical lists are supported.")

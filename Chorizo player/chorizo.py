@@ -16,7 +16,7 @@
 # =============================================================================
 
 from sound4python import sound
-from multiprocessing oimport Process
+from multiprocessing import Process
 import math
 import serial
 import sys

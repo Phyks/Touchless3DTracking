@@ -73,6 +73,7 @@ running = True
 while running:
     char = getch()
     if char == "q":
+        print("Exiting...")
         running = False
         continue
     elif char == "a":
@@ -93,7 +94,7 @@ while running:
         continue
 
     print("Playing "+char.upper())
-    processes.append(Process(target=play_wave, args=(frequency, 0.2)))
+    processes.append(Process(target=play_wave, args=(frequency, math.floor(0.2 * frequency + 1) / frequency)))
     processes[-1].start()
 
 for i in processes:
