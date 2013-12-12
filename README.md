@@ -35,6 +35,17 @@ __(working on)__
 
 A script to play music using chorizo pads as a musical keyboard. See [our website](http://hackens.org/Projets/TouchlessTracking) (french, but vids are available, more coming soon) for infos and demos.
 
+Launch `test_player.py` and use your keyboard to play music for now (A, B, C, D, E, F and G keys).
+
+# Noel2013
+
+
+__(working on)__
+
+Our code for a demo at Christmas party 2013. We wanted to play Jingle Bells using a chorizo player, 5 notes to fetch from the array and map to real sound.
+
+Use the same basis as `test_player.py` so it is also usable with a keyboard for fallback if whatever bad happen :)
+
 ### 3d view
 
 __(working on)__
