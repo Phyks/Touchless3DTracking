@@ -19,24 +19,14 @@ from sound4python import sound
 from multiprocessing import Process
 import math
 
+
 class _Getch:
     """Gets a single character from standard input.  Does not echo to the
 screen."""
-    def __init__(self):
-        try:
-            self.impl = _GetchWindows()
-        except ImportError:
-            self.impl = _GetchUnix()
-
-    def __call__(self): return self.impl()
-
-
-class _GetchUnix:
-    def __init__(self):
-        import tty, sys
-
     def __call__(self):
-        import sys, tty, termios
+        import sys
+        import tty
+        import termios
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
         try:
@@ -46,16 +36,8 @@ class _GetchUnix:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
 
-
-class _GetchWindows:
-    def __init__(self):
-        import msvcrt
-
-    def __call__(self):
-        import msvcrt
-        return msvcrt.getch()
-
 getch = _Getch()
+
 
 def play_wave(frequency=440, nb_secs=1.):
     sine_wave = []
@@ -94,7 +76,9 @@ while running:
         continue
 
     print("Playing "+char.upper())
-    processes.append(Process(target=play_wave, args=(frequency, math.floor(0.2 * frequency + 1) / frequency)))
+    processes.append(Process(target=play_wave,
+                     args=(frequency,
+                           math.floor(0.2 * frequency + 1) / frequency)))
     processes[-1].start()
 
 for i in processes:
