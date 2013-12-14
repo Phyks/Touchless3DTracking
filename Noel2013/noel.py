@@ -61,7 +61,7 @@ def read_serial(ser):
 framerate = 16000
 processes = []
 frequencies = {"FA": 698.5, "SOL": 784, "LA": 880, "SIb": 932, "DO": 1046.5}
-notes = frequencies.keys()
+notes = list(frequencies.keys())
 thresholds = []
 measures = []
 
@@ -69,21 +69,24 @@ serial_port = "/dev/ttyACM0"
 serial_speed = 115200
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "hs:", ["help", "serial="])
+    opts, args = getopt.getopt(sys.argv[1:], "hs:S:", ["help", "serial=",
+                                                       "speed="])
 
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print("Touchless 3D tracking with color mapping")
+            print("Play music with chorizos ! Only a limited set of notes " +
+                  "is available to play jingle bells.")
             print("\nUsage : "+sys.argv[0]+" [OPTIONS]")
-            print("\nTrack the position of your hand in 3D and map it " +
-                  "in RGB space")
             print("\nOptions :")
             print("\t-h (--help) \t display this help message")
             print("\t-s (--serial=) \t change serial port (default is " +
                   "/dev/tty/ACM0")
+            print("\t-S (--speed=) \t change serial speed (default is 115200)")
             sys.exit(0)
         elif opt in ("-s", "--serial"):
             serial_port = arg
+        elif opt in ("-S", "--speed"):
+            serial_speed = arg
 except getopt.GetoptError:
     pass
 
@@ -94,66 +97,63 @@ except Exception as e:
     sys.exit("Invalid serial port options : "+str(e))
 
 try:
-    ser.open()
+    if not ser.isOpen():
+        ser.open()
 except Exception as e:
     sys.exit("Error while opening serial port : "+str(e))
-
-if not ser.isOpen():
-    sys.exit("Serial port not opened")
 
 ser.flushInput()
 ser.flushOutput()
 
 # Handle calibration
-for i in len(notes):
+for i in range(len(notes)):
     print("Calibrating note "+notes[i])
-    print("Touch and release the key now... Will get 10k samples.")
+    print("Touch and release the key now... Will get 1k samples.")
 
-    for sample in range(10000):
-        measures[sample] = read_serial(ser)
+    for sample in range(1000):
+        measure = read_serial(ser)
+        measures[sample] = measure[i]
 
     measures.sort()
     max_diff = 0
     max_diff_index = 0
 
-    for sample in range(10000-1):
-        if measures[sample+1]-measures[sample]:
+    for sample in range(1000-1):
+        if measures[sample+1]-measures[sample] > max_diff:
             max_diff = measures[sample+1]-measures[sample]
             max_diff_index = sample
 
     thresholds[i] = (measures[max_diff_index+1]+measures[max_diff_index])/2
 
 # Main loop
-# *** TODO *** : Add fetch from the serial also
 print("Running... Press q to quit.")
 running = True
 while running:
     serial_input = read_serial(ser)
-    
-    for note in range(notes):
-        
-    
-    char = getch()
-    if char == "q":
-        print("Exiting...")
-        running = False
-        continue
-    if char == "a":
-        frequency = frequencies[0]
-    if char == "b":
-        frequency = frequencies[1]
-    if char == "c":
-        frequency = frequencies[2]
-    if char == "d":
-        frequency = frequencies[3]
-    if char == "e":
-        frequency = frequencies[4]
-    if char == "f":
-        frequency = frequencies[5]
-    if char == "g":
-        frequency = frequencies[6]
-    else:
-        continue
+    frequency = 0
+
+    for note in range(len(notes)):
+        if serial_input[note] > thresholds[note]:
+            frequency = frequencies[notes[note]]
+
+    if frequency == 0:
+        char = getch()
+        if char == "q":
+            print("Exiting...")
+            running = False
+            continue
+        if char == "a":
+            frequency = frequencies["LA"]
+        elif char == "b":
+            frequency = frequencies["SIb"]
+        elif char == "c":
+            frequency = frequencies["DO"]
+        elif char == "e":
+            frequency = frequencies["FA"]
+        elif char == "g":
+            frequency = frequencies["SOL"]
+        else:
+            continue
 
     print("Playing "+char.upper())
     processes.append(Process(target=play_wave,
